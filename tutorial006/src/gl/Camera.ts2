@@ -1,0 +1,71 @@
+import { mat4 } from "gl-matrix";
+import { Transform } from "./Transform";
+import { deg2rad } from "./utils";
+
+export type CameraMode = "orbit" | "free";
+
+export class Camera {
+  projectionMatrix: mat4 = new Float32Array(16); // this should be the matrix that transforms the world into the cube but with perspective
+  transform: Transform = new Transform(); // Holds the position of the camera
+  viewMatrix: mat4 = new Float32Array(16); // Holds the inverse of the transform.
+  mode: CameraMode = "orbit";
+
+  constructor(aspect: number, fov: number = deg2rad(45), near: number = 0.1, far: number = 100.0) {
+    mat4.perspective(this.projectionMatrix, fov, aspect, near, far);
+  }
+
+  panX(v: number) {
+    // Panning on X axis only allowed in free mode.
+    if (this.mode == "orbit") {
+      return;
+    }
+
+    this.updateViewMatrix();
+    this.transform.position[0] += this.transform.right[0] * v;
+    this.transform.position[1] += this.transform.right[1] * v;
+    this.transform.position[2] += this.transform.right[2] * v;
+  }
+
+  panY(v: number) {
+    this.updateViewMatrix();
+    this.transform.position[1] = this.transform.up[1] * v;
+
+    if (this.mode == "orbit") {
+      // Can only move up and down the y axis in orbit mode
+      return;
+    }
+
+    this.transform.position[0] = this.transform.up[0] * v;
+    this.transform.position[2] = this.transform.up[2] * v;
+  }
+
+  panZ(v: number) {
+    this.updateViewMatrix();
+    if (this.mode == "orbit") {
+      this.transform.position[2] += v;
+    } else {
+      this.transform.position[0] += this.transform.forward[0] * v;
+      this.transform.position[1] += this.transform.forward[1] * v;
+      this.transform.position[2] += this.transform.forward[2] * v;
+    }
+  }
+
+  // Camera shouldn't scale.
+  updateViewMatrix() {
+    mat4.identity(this.transform.matView);
+    if (this.mode == "free") {
+      mat4.translate(this.transform.matView, this.transform.matView, this.transform.position);
+      mat4.rotateX(this.transform.matView, this.transform.matView, this.transform.rotation[0]);
+      mat4.rotateY(this.transform.matView, this.transform.matView, this.transform.rotation[1]);
+    } else {
+      mat4.rotateX(this.transform.matView, this.transform.matView, this.transform.rotation[0]);
+      mat4.rotateY(this.transform.matView, this.transform.matView, this.transform.rotation[1]);
+      mat4.translate(this.transform.matView, this.transform.matView, this.transform.position);
+    }
+
+    this.transform.updateDirection();
+
+    // View matrix is the inverse of the camera matrix which is then used to transform the world
+    mat4.invert(this.viewMatrix, this.transform.matView);
+  }
+}

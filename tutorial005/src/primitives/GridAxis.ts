@@ -1,5 +1,5 @@
-import { GL, GLError } from "../gl/GL";
-import { VAOWrapper } from "../types";
+import {GL, GLError} from "../gl/GL";
+import {VAOWrapper} from "../types";
 
 export class GridAxis {
   static createVAO(gl: GL, locations: { a_position: number; a_color: number }): VAOWrapper<"a_position"> {
@@ -67,6 +67,8 @@ export class GridAxis {
     vertices[idx + 13] = -half;
     vertices[idx + 14] = 0.0;
     vertices[idx + 15] = 3;
+
+    console.log(vertices);
 
     const buf = gl.createBuffer();
     if (buf == undefined) {
