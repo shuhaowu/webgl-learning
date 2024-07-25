@@ -73,7 +73,6 @@ export class Camera {
 type ControlMode = "pan" | "arcball";
 
 export class CameraController {
-  #gl: GL;
   #canvas: HTMLCanvasElement;
   #camera: Camera;
 
@@ -89,8 +88,7 @@ export class CameraController {
   #boundOnMouseMove: (ev: MouseEvent) => void;
   #boundOnMouseUp: (ev: MouseEvent) => void;
 
-  constructor(gl: GL, canvas: HTMLCanvasElement, camera: Camera) {
-    this.#gl = gl;
+  constructor(canvas: HTMLCanvasElement, camera: Camera) {
     this.#canvas = canvas;
     this.#camera = camera;
 

@@ -31,7 +31,7 @@ export class App {
     this._gl.clearAll();
 
     this._camera = new Camera(this._canvas.width / this._canvas.height);
-    this._cameraController = new CameraController(this._gl, this._canvas, this._camera);
+    this._cameraController = new CameraController(this._canvas, this._camera);
 
     this._gridAxis = new GridAxis(this._gl);
 
